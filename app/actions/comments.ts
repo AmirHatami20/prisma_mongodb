@@ -62,10 +62,12 @@ export async function createComment({content, postId, authorId}: PostCreateComme
 // DELETE Comment
 export async function deleteComment(id: string) {
     try {
-        return await prisma.comment.delete({
+        const comment = await prisma.comment.delete({
             where: {id}
         });
 
+        revalidatePath('/');
+        return comment;
     } catch (error) {
         console.error(`Error fetching user with ID ${id}:`, error);
         throw error;

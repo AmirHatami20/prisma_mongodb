@@ -27,7 +27,7 @@ export default function UserList({initialUsers}: UserListProps) {
     const router = useRouter();
 
     const handleDeleteUser = async (id: string) => {
-        await deleteUser(id);
+        await deleteUser(id)
 
         toast.success("User Removed successfully");
         router.refresh();

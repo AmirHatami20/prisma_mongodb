@@ -84,17 +84,19 @@ export async function createUser({email, name}: { email: string; name: string })
 // REMOVE User
 export async function deleteUser(id: string) {
     try {
-        // First delete dependent records manually
-        await prisma.comment.deleteMany({where: {authorId: id}});
-        await prisma.post.deleteMany({where: {authorId: id}});
+        // Delete related comments and posts in parallel
+        await Promise.all([
+            prisma.comment.deleteMany({where: {authorId: id}}),
+            prisma.post.deleteMany({where: {authorId: id}}),
+        ]);
 
-        // Then delete the user
-        return await prisma.user.delete({
-            where: {id}
-        });
+        // Delete user
+        const result = await prisma.user.delete({where: {id}});
 
+        revalidatePath('/');
+        return result;
     } catch (error) {
-        console.error(`Error fetching user with ID ${id}:`, error);
-        throw error;
+        console.error(`[deleteUser] Error deleting user with ID ${id}:`, error);
+        throw new Error('Failed to delete user');
     }
 }

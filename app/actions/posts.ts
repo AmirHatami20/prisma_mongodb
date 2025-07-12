@@ -83,10 +83,12 @@ export async function deletePost(id: string) {
     try {
         await prisma.comment.deleteMany({where: {postId: id}});
 
-        return await prisma.post.delete({
+        const post = await prisma.post.delete({
             where: {id}
         });
 
+        revalidatePath('/');
+        return post;
     } catch (error) {
         console.error(`Error fetching user with ID ${id}:`, error);
         throw error;
