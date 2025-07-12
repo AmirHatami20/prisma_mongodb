@@ -66,9 +66,9 @@ export default function PostList({initialPosts}: PostListProps) {
             toast.success("Comment added successfully");
             router.refresh();
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error adding comment:', error);
-            toast.error(error.message || "Failed to add comment");
+            toast.error((error as Error).message || "Failed to create user");
         } finally {
             setSubmitting(null);
         }
