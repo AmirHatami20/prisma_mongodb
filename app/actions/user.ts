@@ -1,7 +1,9 @@
 "use server"
 
 import prisma from "@/lib/prisma";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {revalidatePath} from "next/cache";
+
 
 // GET User
 export async function getUsers() {
@@ -53,28 +55,28 @@ export async function getUserById(id: string) {
 
 // CREATE User
 export async function createUser({email, name}: { email: string; name: string }) {
-    if (!email) {
+    if (!email.trim()) {
         throw new Error('Email is required');
     }
 
     try {
         const user = await prisma.user.create({
-            data: {
-                email,
-                name
-            },
+            data: {email, name},
         });
 
-        // Revalidate the home page to show the new user
         revalidatePath('/');
-
         return user;
-    } catch (error: any) {
-        // Handle duplicate email error
-        if (error.code === 'P2002') {
+    } catch (error: unknown) {
+        if (
+            error instanceof PrismaClientKnownRequestError &&
+            error.code === 'P2002' &&
+            Array.isArray(error.meta?.target) &&
+            error.meta.target.includes('email')
+        ) {
             throw new Error('A user with this email already exists');
         }
 
+        console.error('[CreateUserError]', error);
         throw new Error('Failed to create user');
     }
 }
