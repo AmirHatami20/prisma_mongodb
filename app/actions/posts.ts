@@ -81,7 +81,9 @@ export async function createPost({title, content, authorId, published = false}: 
 // DELETE Posts
 export async function deletePost(id: string) {
     try {
-        await prisma.comment.deleteMany({where: {postId: id}});
+        await Promise.all([
+            prisma.comment.deleteMany({where: {postId: id}})
+        ])
 
         const post = await prisma.post.delete({
             where: {id}
