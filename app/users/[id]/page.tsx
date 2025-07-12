@@ -1,12 +1,9 @@
 import {getUserById} from '@/app/actions/user';
 import {notFound} from 'next/navigation';
 
-interface Props {
-    params: { id: string };
-}
-
-async function UserPage({params}: Props) {
-    const user = await getUserById(params.id);
+export default async function UserPage({params,}: { params: Promise<{ id: string }>; }) {
+    const {id} = await params;
+    const user = await getUserById(id);
 
     if (!user) return notFound();
 
@@ -34,5 +31,3 @@ async function UserPage({params}: Props) {
         </div>
     );
 }
-
-export default UserPage;
