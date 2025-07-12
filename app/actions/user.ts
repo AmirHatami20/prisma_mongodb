@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
 import {revalidatePath} from "next/cache";
 
-
 // GET User
 export async function getUsers() {
     try {
